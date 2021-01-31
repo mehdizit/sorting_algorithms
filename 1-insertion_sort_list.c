@@ -1,58 +1,48 @@
 #include "sort.h"
-/**
- * insertion_sort_list - Sorts a doubly linked list of integers
- *                       using the insertion sort algorithm.
- * @list: A pointer to the head of a doubly-linked list of integers.
- *
- * Description: Prints the list after each swap.
- */
 
+/**
+ * insertion_sort_list - sorts a doubly linked list of integers in ascending
+ * order using the Insertion sort algorithm
+ * @list: list to be sorted
+ * Return: void
+ */
 void insertion_sort_list(listint_t **list)
 {
-	int m;
-	listint_t *cur;
+	listint_t *current; /* traverses list */
+	listint_t *temp; /* holds temp values */
 
-	cur = *list;
-	if (cur->next == NULL)
-		return;
-	listint_t *ptr, *tmp;
+	current = *list;
+	current = current->next;
 
-	cur = cur->next;
 	if (list == NULL || *list == NULL || (*list)->next == NULL)
 		return;
-	while (cur != NULL)
+
+	while (current != NULL)
 	{
-		m = 0;
-		ptr = cur;
-		tmp = cur->prev;
-		cur = cur->next;
-		while (tmp != NULL && tmp->n > ptr->n)
+		while (current->prev != NULL && current->n < current->prev->n)
 		{
-			m++;
-			tmp = tmp->prev;
+			temp = current;
+
+			/* link next and previous nodes together */
+			if (current->next != NULL)
+				current->next->prev = temp->prev;
+			current->prev->next = temp->next;
+
+			/* move to previous node, insert temp node before it */
+			current = current->prev;
+			temp->prev = current->prev;
+			temp->next = current;
+			if (current->prev != NULL)
+				current->prev->next = temp;
+			current->prev = temp;
+
+			/* if node is new head of list, set it to *list */
+			if (temp->prev == NULL)
+				*list = temp;
+
+			print_list(*list);
+			current = current->prev;
 		}
-		if (m)
-		{
-			ptr->prev->next = ptr->next;
-			if (ptr->next != NULL)
-				ptr->next->prev = ptr->prev;
-			if (tmp == NULL)
-			{
-				tmp = *list;
-				ptr->prev = NULL;
-				ptr->next = tmp;
-				ptr->next->prev = ptr;
-				*list = ptr;
-			}
-			else
-			{
-				tmp = tmp->next;
-				tmp->prev->next = ptr;
-				ptr->prev = tmp->prev;
-				tmp->prev = ptr;
-				ptr->next = tmp;
-			}
-		}
-		print_list(*list);
+		current = current->next;
 	}
 }
